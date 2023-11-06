@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% extends 'base.html' %}
+    {% block title %}File Upload{% endblock %}
+</head>
+<body>
+    {% block content %}
+    <h2>File Upload</h2>
+    <form id="uploadForm" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file" id="fileInput">
+        <br><br>
+        <div id="fileDisplayArea"></div>
+        <br><br>
+        <button type="submit">Start Upload</button>
+    </form>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function() {
+            var file = this.files[0];
+            var fileDisplayArea = document.getElementById('fileDisplayArea');
+            fileDisplayArea.innerText = "Selected file: " + file.name;
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>

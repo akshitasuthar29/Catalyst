@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% extends 'base.html' %}
+    {% block title %}Data Dropdowns{% endblock %}
+</head>
+<body>
+    {% block content %}
+    <h2>Query</h2>
+    <form id="data-form" onsubmit="submitForm(event)">
+        <br><br>
+
+        <label for="industry">Industry:</label>
+        <select id="industry-dropdown" name="industry">
+            <option value="" selected disabled hidden>Choose here</option>
+            {% for item in industry %}
+                <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+
+        <br><br>
+        <label for="country">Country:</label>
+        <select id="country-dropdown" name="country">
+            <option value="" selected disabled hidden>Choose here</option>
+            {% for item in country %}
+                <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault();
+            const form = document.getElementById('data-form');
+            const formData = new FormData(form);
+    
+            fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data: formData }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = `API Response: ${JSON.stringify(data)}`;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+    </script>
+    {% endblock %}
+</body>
+</html>

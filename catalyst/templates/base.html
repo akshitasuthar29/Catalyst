@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+
+    <button onclick="redirectToUpload()">Upload</button>
+    <button onclick="redirectToBuilder()">Query Builder</button>
+    <button onclick="redirectToAdduser()">Add Users</button>
+
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+
+    {% block content %}{% endblock %}
+
+    <script>
+        function redirectToUpload() {
+            window.location.href = "/upload/"; // Redirects to the /upload/ endpoint
+        }
+
+        function redirectToBuilder() {
+            window.location.href = "/query_builder/"; // Redirects to the /upload/ endpoint
+        }
+
+        function redirectToAdduser() {
+            window.location.href = "/users/"; // Redirects to the /upload/ endpoint
+        }
+
+    
+        function logout() {
+            // Add your logout functionality here
+            // For example, redirect to the logout page or perform necessary actions to log the user out
+            // You can use window.location to redirect the user to the logout page
+        }
+    </script>
+
+</body>
+</html>
