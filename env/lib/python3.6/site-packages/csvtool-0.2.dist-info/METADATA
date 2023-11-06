@@ -1,0 +1,24 @@
+Metadata-Version: 2.1
+Name: csvtool
+Version: 0.2
+Summary: csvtool is an easy to use command-line tool to work with .CSV files.
+Home-page: https://github.com/maroofi/csvtool/
+Author: Sourena Maroofi
+Author-email: maroofi@gmail.com
+License: MIT
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Text Processing
+Classifier: Topic :: Education
+Classifier: Environment :: Console
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python :: 3
+
+
+csvtool is a simple command-line tool to 1) extract statistics, 2) perform regular expression search and, 3) generate output file 
+without writing code for such simple tasks for .CSV files.
+
+

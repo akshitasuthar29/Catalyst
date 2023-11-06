@@ -1,0 +1,3 @@
+[console_scripts]
+csvtool = csvtool.csvtool:main
+
