@@ -3,15 +3,49 @@
 <head>
     {% extends 'base.html' %}
     {% block title %}Users{% endblock %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .user-list {
+            padding: 0;
+        }
+
+        .user-list li {
+            list-style: none;
+            margin-bottom: 10px;
+        }
+
+        .add-user-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: lightblue;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 {% block content %}
-    <h1>User List</h1>
-    <ul id="user-list">
-        <!-- Populate this list dynamically with data fetched from the Django API -->
-    </ul>
+    <div class="container">
+        <h1>List of Users</h1>
+        <ul class="user-list" id="user-list">
+            {% for user in users %}
+                <li>{{ user }}</li>
+            {% endfor %}
+        </ul>
 
-    <button onclick="addUser()">Add User</button>
+        <button onclick="addUser()" class="add-user-button">Add User</button>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         async function fetchUsers() {
@@ -21,9 +55,9 @@
 
                 const userList = document.getElementById('user-list');
                 if (Array.isArray(data.data)) {
-                    data.data.forEach(email => {
+                    data.data.forEach(user => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = email;
+                        listItem.textContent = `${user.username} - ${user.email}`;
                         userList.appendChild(listItem);
                     });
                 } else {
@@ -40,6 +74,6 @@
 
         fetchUsers();
     </script>
-      {% endblock %}
+{% endblock %}
 </body>
 </html>

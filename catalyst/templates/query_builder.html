@@ -6,50 +6,86 @@
 </head>
 <body>
     {% block content %}
-    <h2>Query</h2>
+    <h2>Query Builder</h2>
     <form id="data-form" onsubmit="submitForm(event)">
         <br><br>
 
-        <label for="industry">Industry:</label>
         <select id="industry-dropdown" name="industry">
-            <option value="" selected disabled hidden>Choose here</option>
+            <option value="" selected disabled hidden>Industry</option>
             {% for item in industry %}
                 <option value="{{ item }}">{{ item }}</option>
             {% endfor %}
         </select>
-
         <br><br>
-        <label for="country">Country:</label>
+        
         <select id="country-dropdown" name="country">
-            <option value="" selected disabled hidden>Choose here</option>
+            <option value="" selected disabled hidden>Country</option>
             {% for item in country %}
                 <option value="{{ item }}">{{ item }}</option>
             {% endfor %}
         </select>
         <br><br>
-        <button type="submit">Submit</button>
+        
+        <select id="city-dropdown" name="city">
+            <option value="" selected disabled hidden>City</option>
+            {% for item in city %}
+                <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        
+        <select id="year-dropdown" name="year">
+            <option value="" selected disabled hidden>Year</option>
+            {% for item in year %}
+                <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        
+        <select id="domain-dropdown" name="domain">
+            <option value="" selected disabled hidden>Domain</option>
+            {% for item in domain %}
+                <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <div>
+            <button type="submit">Submit</button>
+            <button type="button" onclick="resetForm()">Reset</button>
+        </div>
     </form>
+
+    <br><br>
+    <div id="result"></div>
 
     <script>
         function submitForm(event) {
             event.preventDefault();
             const form = document.getElementById('data-form');
             const formData = new FormData(form);
-    
+
+            // Convert the year to an integer before sending it
+            const year = formData.get('year');
+            formData.set('year', parseInt(year));
+
             fetch('', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ data: formData }),
+                body: formData,
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('result').innerHTML = `API Response: ${JSON.stringify(data)}`;
+                const count = data.count;
+                document.getElementById('result').innerHTML = `${count} records found in this query`;
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
+        }
+
+        function resetForm() {
+        const form = document.getElementById('data-form');
+        form.reset();
+        document.getElementById('result').innerHTML = ''; // Clear the result text
     }
     </script>
     {% endblock %}

@@ -13,7 +13,7 @@
         <br><br>
         <div id="fileDisplayArea"></div>
         <br><br>
-        <button type="submit">Start Upload</button>
+        <button type="submit" onclick="handleUpload(event)">Start Upload</button>
     </form>
 
     <script>
@@ -22,6 +22,19 @@
             var fileDisplayArea = document.getElementById('fileDisplayArea');
             fileDisplayArea.innerText = "Selected file: " + file.name;
         });
+
+        async function handleUpload(event) {
+            event.preventDefault(); // Prevents the form from submitting
+
+            // Perform the upload action here
+            const response = await fetch('/upload/', {
+                method: 'POST',
+                body: new FormData(document.getElementById('uploadForm'))
+            });
+            
+            const jsonData = await response.json();
+            alert(JSON.stringify(jsonData, null, 2)); // Display the JSON response in a pop-up
+        }
     </script>
     {% endblock %}
 </body>

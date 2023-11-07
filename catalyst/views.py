@@ -12,6 +12,7 @@ from allauth.account.forms import SignupForm
 from .models import CMIUsers
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from background_task import background
 import pandas as pd
 #import numpy as np
 # Create your views here.
@@ -45,13 +46,14 @@ def home(request):
 @csrf_exempt
 def users(request):
     if request.method=="GET":
-        users = list(CMIUsers.objects.all().values_list('email',flat=True))
-    data = {
-        'data': users
-    }
-
-    return JsonResponse(data)
-    #return render(request, 'users.html')
+        #import pdb; pdb.set_trace()
+        users = CMIUsers.objects.all().values_list('username','email')
+        user_list = [list(item) for item in users]
+        data = {
+            'users': user_list
+        }
+        return render(request, 'users.html', data)
+    return render(request, 'users.html')
 
 @csrf_exempt
 def adduser(request):
@@ -63,9 +65,10 @@ def adduser(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save(request)
+            username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password1']
-            cmi_user = CMIUsers.objects.create(user=user, email=email, password=password) 
+            cmi_user = CMIUsers.objects.create(user=user, email=email, password=password, username = username) 
             cmi_user.save()
             return redirect('users')
         else:
@@ -75,6 +78,23 @@ def adduser(request):
     return JsonResponse({"message":"User submitted"})
 
 
+@background(schedule=0)
+def process_file(file_path):
+    for chunk in pd.read_csv(file_path, chunksize=700000):
+        for index, row in chunk.iterrows():
+            Catalyst.objects.create(
+                name=row['name'],
+                domain=row['domain'],
+                year=row['year founded'],
+                industry=row['industry'],
+                size_range=row['size range'],
+                city=row['locality'],
+                country=row['country'],
+                linkedin_url=row['linkedin url']
+            )
+
+
+
 @csrf_exempt
 def upload(request):
     if not request.user.is_authenticated:
@@ -82,66 +102,59 @@ def upload(request):
     if request.method=="GET":
         return render(request, 'upload.html')
 
-    if request.method=="POST" and request.FILES['file']:
-        print("jdskhfjsh")
-        #file = request.FILES['file']
-        file= '/home/akshitasuthar/post/free-7-million-company-dataset/cmp.csv'
+    if request.method == "POST" and request.FILES['file']:
+        file = request.FILES['file']
 
-        # Iterate through file chunks and save them
-        for chunk in pd.read_csv(file, chunksize=100):
-            for index, row in chunk.iterrows():
-                created = Catalyst.objects.update_or_create(
-                    name=row['name'],
-                    domain=row['domain'],
-                    year=row['year founded'],
-                    industry=row['industry'],
-                    size_range=row['size range'],
-                    city=row['locality'],
-                    country=row['country'],
-                    linkedin_url=row['linkedin url']
-                )
-                if not created:
-                    return JsonResponse({'message': 'File already exists. Skipped uploading.'})
+        # Assuming you have saved the file locally, use its path
+        file_path = '/home/akshitasuthar/post/free-7-million-company-dataset/companies_sorted2.csv'
 
-        if created:
-            message = 'File upload successful.'
-        else:
-            message = 'File already exists. Skipped uploading.'
-
-
-        return JsonResponse({'message': message})
+        process_file(file_path)
+        return JsonResponse({'message': 'File upload successfully.'})
 
     return JsonResponse({'message': 'File upload failed.'})
 
 
 @csrf_exempt
 def query_builder(request):
-    if request.method=="GET":
-        """city = Catalyst.objects.all().values_list('city',flat=True).distinct()
-        state = Catalyst.objects.all().values_list('state',flat=True).distinct()
-        industry = Catalyst.objects.all().values_list('industry',flat=True).distinct()
-        year_founded = Catalyst.objects.all().values_list('year',flat=True).distinct()"""
-        country = Catalyst.objects.all().values_list('country',flat=True).distinct()
+    if request.method == "GET":
+        
+        city = Catalyst.objects.all().values_list('city', flat=True).distinct().order_by('city')
+        industry = Catalyst.objects.all().values_list('industry', flat=True).distinct().order_by('industry')
+        country = Catalyst.objects.all().values_list('country', flat=True).distinct().order_by('country')
+        year = Catalyst.objects.all().values_list('year', flat=True).distinct().order_by('-year')
+        domain = Catalyst.objects.all().values_list('domain', flat=True).distinct().order_by('domain')
 
         context = {
-            #'city': city,
-            #'industry': industry,
-            #'year_founded': year_founded,
-            'country': country
+            'city': city,
+            'industry': industry,
+            'country': country,
+            'year' : year,
+            'domain' : domain
         }
         return render(request, 'query_builder.html', context)
 
-    if request.method=="POST":
+    if request.method == "POST":
         try:
-            data = request.POST.get('country')
-            print("hey")
-            queryset = Catalyst.objects.filter(country=data).distinct().count()
+            #import pdb; pdb.set_trace()
+            country_data = request.POST.get('country')
+            city_data = request.POST.get('city')
+            industry_data = request.POST.get('industry')
+            domain_data = request.POST.get('domain')
 
-            return JsonResponse({'message': "Success","count":queryset})
-            return JsonResponse(results, safe=False)
+            query_set = Catalyst.objects.filter(
+            country__iexact=country_data,
+            industry__iexact=industry_data, city__iexact=city_data, domain=domain_data).distinct()
+
+            count = query_set.count()
+
+            return JsonResponse({'message': 'Success', 'count': count})
         except Exception as e:
-            return HttpResponse(f"An error occurred: {e}")
+            return JsonResponse({'message': f'An error occurred: {e}'}, status=500)
 
     return HttpResponse("Invalid request method.")
+
+
         
+
+
 

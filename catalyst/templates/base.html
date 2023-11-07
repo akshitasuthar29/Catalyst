@@ -2,18 +2,45 @@
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .top-line {
+            background-color: lightgrey;
+            padding: 10px;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            background-color: lightgrey;
+            padding: 6px 12px;
+            margin-right: 10px;
+        }
+
+        .logout-link {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .top-line button {
+            margin-right: 10px;
+        }
+
+    </style>
 </head>
 <body>
-
+    <div class="row top-line">
     <button onclick="redirectToUpload()">Upload</button>
     <button onclick="redirectToBuilder()">Query Builder</button>
     <button onclick="redirectToAdduser()">Add Users</button>
 
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
-        <button type="submit">Logout</button>
+        <button type="submit" class="logout-link">Logout</button>
     </form>
-
+    </div>
     {% block content %}{% endblock %}
 
     <script>

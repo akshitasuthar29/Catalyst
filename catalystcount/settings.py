@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'catalyst',
     'allauth',
     'allauth.account',
+    'background_task',
 ]
 
 MIDDLEWARE = [
